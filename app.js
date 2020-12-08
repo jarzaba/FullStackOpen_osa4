@@ -6,6 +6,7 @@ const cors = require('cors');
 const blogRouter = require('./controllers/blogRouter');
 const userRouter = require('./controllers/userRouter');
 const loginRouter = require('./controllers/loginRouter');
+const commentRouter = require('./controllers/commentRouter');
 const middleware = require('./utils/middleware');
 const logger = require('./utils/logger');
 const mongoose = require('mongoose');
@@ -30,12 +31,17 @@ app.use(cors());
 app.use(express.json());
 app.use(middleware.requestLogger);
 app.use(middleware.tokenExtractor);
-app.use(express.static('build'));
 app.use('/api/blogs', blogRouter);
 app.use('/api/users', userRouter);
 app.use('/api/login', loginRouter);
+app.use('/api/comments', commentRouter);
 
-//app.use(middleware.unknownEndpoint);
+if (process.env.NODE_ENV === 'test') {
+  const testingRouter = require('./controllers/testRouter');
+  app.use('/api/testing', testingRouter);
+}
+
+app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 
 module.exports = app;
